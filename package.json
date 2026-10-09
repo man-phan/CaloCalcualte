@@ -1,0 +1,14 @@
+{
+  "name": "calo-calculate",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "install:all": "npm install --prefix nodejs && npm install --prefix fe",
+    "dev": "concurrently \"npm run dev --prefix nodejs\" \"npm run dev --prefix fe\"",
+    "build": "npm run build --prefix fe",
+    "start": "npm run start --prefix nodejs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

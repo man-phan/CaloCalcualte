@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum ActivityLevel {
+  LOW
+  LIGHT
+  MODERATE
+  ACTIVE
+  VERY_ACTIVE
+}
+
+model User {
+  id           String        @id @default(cuid())
+  username     String        @unique
+  passwordHash String        @map("password_hash")
+
+  gender        Gender?
+  birthYear     Int?          @map("birth_year")
+  heightCm      Float?        @map("height_cm")
+  weightKg      Float?        @map("weight_kg")
+  activityLevel ActivityLevel? @map("activity_level")
+
+  timezone String @default("Asia/Ho_Chi_Minh")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  goals Goal[]
+  meals Meal[]
+
+  @@map("users")
+}
+
+model Goal {
+  id     String @id @default(cuid())
+  userId String @map("user_id")
+
+  lossKgPerMonth Float @map("loss_kg_per_month")
+
+  dailyCalories Float @map("daily_calories")
+  dailyProteinG Float @map("daily_protein_g")
+  dailyCarbsG   Float @map("daily_carbs_g")
+  dailyFatG     Float @map("daily_fat_g")
+  dailyFiberG   Float @map("daily_fiber_g")
+
+  startDate DateTime  @map("start_date")
+  endDate   DateTime? @map("end_date")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("goals")
+}
+
+model Meal {
+  id     String @id @default(cuid())
+  userId String @map("user_id")
+
+  description String?
+  eatenAt     DateTime @map("eaten_at")
+
+  totalCalories Float @map("total_calories")
+  totalProteinG Float @map("total_protein_g")
+  totalCarbsG   Float @map("total_carbs_g")
+  totalFatG     Float @map("total_fat_g")
+  totalFiberG   Float @map("total_fiber_g")
+
+  aiModel String? @map("ai_model")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items MealItem[]
+
+  @@map("meals")
+}
+
+model MealItem {
+  id     String @id @default(cuid())
+  mealId String @map("meal_id")
+
+  foodName  String @map("food_name")
+  portionG  Float  @map("portion_g")
+
+  calories Float
+  proteinG Float @map("protein_g")
+  carbsG   Float @map("carbs_g")
+  fatG     Float @map("fat_g")
+  fiberG   Float @map("fiber_g")
+
+  meal Meal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@map("meal_items")
+}
